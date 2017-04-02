@@ -67,7 +67,7 @@ Morgage
 
 </table>
 </div>
-<svg width="500" height="250"></svg>
+<svg width="400" height="250"></svg>
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <script type="text/javascript">
 
@@ -92,38 +92,38 @@ Morgage
   		var home_own1 = [];
   		var Own_defaulter = data.filter(function(d) { return d.home_ownership == 1 && d.loan_status == 1 ; });
   		console.log(JSON.stringify(Own_defaulter.length));
-  		home_own.push({ name: 'Own_defaulter' , value: Own_defaulter.length });
-  		home_own0.push({ name: 'Own_defaulter' , value: Own_defaulter.length });
+  		home_own.push({ name: 'Own' , value: Own_defaulter.length });
+  		home_own0.push({ name: 'Own' , value: Own_defaulter.length });
   		$("#Own_defaulter")[0].innerHTML = Own_defaulter.length ;
 
   		var Own_nondefaulter = data.filter(function(d) { return d.home_ownership == 1 && d.loan_status == 0 ; });
   		console.log(JSON.stringify(Own_nondefaulter.length));
-  		home_own.push({ name: 'Own_nondefaulter' , value: Own_nondefaulter.length });
-  		home_own1.push({ name: 'Own_nondefaulter' , value: Own_nondefaulter.length });
+  		home_own.push({ name: 'Own' , value: Own_nondefaulter.length });
+  		home_own1.push({ name: 'Own' , value: Own_nondefaulter.length });
   		$("#Own_nondefaulter")[0].innerHTML =Own_nondefaulter.length;
 
   		var Rent_defaulter = data.filter(function(d) { return d.home_ownership == 2 && d.loan_status == 1 ; });
   		console.log(JSON.stringify(Rent_defaulter.length));
-  		home_own.push({ name: 'Rent_defaulter' , value: Rent_defaulter.length });
-  		home_own0.push({ name: 'Rent_defaulter' , value: Rent_defaulter.length });
+  		home_own.push({ name: 'Rent' , value: Rent_defaulter.length });
+  		home_own0.push({ name: 'Rent' , value: Rent_defaulter.length });
   		$("#Rent_defaulter")[0].innerHTML =Rent_defaulter.length ;
 
   		var Rent_nondefaulter = data.filter(function(d) { return d.home_ownership == 2 && d.loan_status == 0 ; });
   		console.log(JSON.stringify(Rent_nondefaulter.length));
-  		home_own.push({ name: 'Rent_nondefaulter' , value: Rent_nondefaulter.length });
-  		home_own1.push({ name: 'Rent_nondefaulter' , value: Rent_nondefaulter.length });
+  		home_own.push({ name: 'Rent' , value: Rent_nondefaulter.length });
+  		home_own1.push({ name: 'Rent' , value: Rent_nondefaulter.length });
 		$("#Rent_nondefaulter")[0].innerHTML = Rent_nondefaulter.length;  		
 
   		var Morgage_defaulter = data.filter(function(d) { return d.home_ownership == 3 && d.loan_status == 1 ; });
   		console.log(JSON.stringify(Morgage_defaulter.length));
-  		home_own.push({ name: 'Morgage_defaulter' , value: Morgage_defaulter.length });
-  		home_own0.push({ name: 'Morgage_defaulter' , value: Morgage_defaulter.length });
+  		home_own.push({ name: 'Morgage' , value: Morgage_defaulter.length });
+  		home_own0.push({ name: 'Morgage' , value: Morgage_defaulter.length });
 		$("#Morgage_defaulter")[0].innerHTML = Morgage_defaulter.length;
 
   		var Morgage_nondefaulter = data.filter(function(d) { return d.home_ownership == 3 && d.loan_status == 0 ; });
   		console.log(JSON.stringify(Morgage_nondefaulter.length));
-  		home_own.push({ name: 'Morgage_nondefaulter' , value: Morgage_nondefaulter.length });
-  		home_own1.push({ name: 'Morgage_nondefaulter' , value: Morgage_nondefaulter.length });
+  		home_own.push({ name: 'Morgage' , value: Morgage_nondefaulter.length });
+  		home_own1.push({ name: 'Morgage' , value: Morgage_nondefaulter.length });
 		$("#Morgage_nondefaulter")[0].innerHTML = Morgage_nondefaulter.length ;
 
 
@@ -149,7 +149,7 @@ Morgage
 		    .data(home_own0)
 		    .enter().append("rect")
 		      .attr("class", "bar")
-		      .attr("x", function(d) { return x(d.name); })
+		      .attr("x", function(d) { return x(d.name)+20; })
 		      .attr("y", function(d) { return y(d.value); })
 		      .attr("width", "25px" )
 		      .attr("height", function(d) { return height - y(d.value); });
@@ -158,7 +158,7 @@ Morgage
 		    .data(home_own1)
 		    .enter().append("rect")
 		      .attr("class", "bar1")
-		      .attr("x", function(d) { return x(d.name); })
+		      .attr("x", function(d) { return x(d.name) + 50; })
 		      .attr("y", function(d) { return y(d.value); })
 		      .attr("width", "25px" )
 		      .attr("height", function(d) { return height - y(d.value); });
