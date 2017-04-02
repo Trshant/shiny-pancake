@@ -3,9 +3,57 @@
 <title>Trshant - Dashboard</title>
 </head>
 <body>
+<div>
+<table>
+<tr>
+<th>
+Type Of home ownership
+</th>
+<th>
+Defaulted
+</th>
+<th>
+Not Defaulted
+</th>
+</tr>
+<tr>
+<td>
+Own
+</td>
+<td id="Own_defaulter">
+</td>
+<td id="Own_nondefaulter">
+</td>
+</tr>
+
+<tr>
+<td>
+Rent
+</td>
+<td id="Rent_defaulter">
+</td>
+<td id="Rent_nondefaulter">
+</td>
+</tr>
+
+<tr>
+<td>
+Morgage
+</td>
+<td id="Morgage_defaulter">
+</td>
+<td id="Morgage_nondefaulter">
+</td>
+</tr>
+
+</table>
+</div>
 <canvas width="960" height="500"></canvas>	
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <script type="text/javascript">
+
+	function $(str){ return document.querySelectorAll(str) ; }
+
 	var canvas = document.querySelector("canvas"),
 	    context = canvas.getContext("2d");
 
@@ -23,7 +71,32 @@
 	context.translate(margin.left, margin.top);
 
 	d3.csv("dashboard_banking_dataset.csv", function(data) {
-  		console.log(data[0]);
+  		console.log(data.length);
+
+  		var Own_defaulter = data.filter(function(d) { return d.home_ownership == 1 && d.loan_status == 1 ; });
+  		console.log(JSON.stringify(Own_defaulter.length));
+  		$("#Own_defaulter")[0].innerHTML = Own_defaulter.length ;
+
+  		var Own_nondefaulter = data.filter(function(d) { return d.home_ownership == 1 && d.loan_status == 0 ; });
+  		console.log(JSON.stringify(Own_nondefaulter.length));
+  		$("#Own_nondefaulter")[0].innerHTML =Own_nondefaulter.length;
+
+  		var Rent_defaulter = data.filter(function(d) { return d.home_ownership == 2 && d.loan_status == 1 ; });
+  		console.log(JSON.stringify(Rent_defaulter.length));
+  		$("#Rent_defaulter")[0].innerHTML =Rent_defaulter.length ;
+
+  		var Rent_nondefaulter = data.filter(function(d) { return d.home_ownership == 2 && d.loan_status == 0 ; });
+  		console.log(JSON.stringify(Rent_nondefaulter.length));
+		$("#Rent_nondefaulter")[0].innerHTML = Rent_nondefaulter.length;  		
+
+  		var Morgage_defaulter = data.filter(function(d) { return d.home_ownership == 3 && d.loan_status == 1 ; });
+  		console.log(JSON.stringify(Morgage_defaulter.length));
+		$("#Morgage_defaulter")[0].innerHTML = Morgage_defaulter.length;
+
+  		var Morgage_nondefaulter = data.filter(function(d) { return d.home_ownership == 3 && d.loan_status == 0 ; });
+  		console.log(JSON.stringify(Morgage_nondefaulter.length));
+		$("#Morgage_nondefaulter")[0].innerHTML = Morgage_nondefaulter.length ;
+
 	});
 
 </script>
