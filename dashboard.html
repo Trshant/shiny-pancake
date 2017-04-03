@@ -74,6 +74,7 @@ Morgage
 	function $(str){ return document.querySelectorAll(str) ; }
 
 	var svg = d3.select("svg");
+	var home_owndership ;
 
 	var margin = {top: 20, right: 20, bottom: 30, left: 40},
 	    width = +svg.attr("width") - margin.left - margin.right,
@@ -90,45 +91,28 @@ Morgage
   		var home_own = [];
   		var home_own0 = [];
   		var home_own1 = [];
-  		var Own_defaulter = data.filter(function(d) { return d.home_ownership == 1 && d.loan_status == 1 ; });
-  		console.log(JSON.stringify(Own_defaulter.length));
-  		home_own.push({ name: 'Own' , value: Own_defaulter.length });
-  		home_own0.push({ name: 'Own' , value: Own_defaulter.length });
-  		$("#Own_defaulter")[0].innerHTML = Own_defaulter.length ;
 
-  		var Own_nondefaulter = data.filter(function(d) { return d.home_ownership == 1 && d.loan_status == 0 ; });
-  		console.log(JSON.stringify(Own_nondefaulter.length));
-  		home_own.push({ name: 'Own' , value: Own_nondefaulter.length });
-  		home_own1.push({ name: 'Own' , value: Own_nondefaulter.length });
-  		$("#Own_nondefaulter")[0].innerHTML =Own_nondefaulter.length;
+  		var homeownsershiparray = ["","Own","Rent","Morgage"];
+  		var loan_status = ["defaulter","nondefaulter"];
 
-  		var Rent_defaulter = data.filter(function(d) { return d.home_ownership == 2 && d.loan_status == 1 ; });
-  		console.log(JSON.stringify(Rent_defaulter.length));
-  		home_own.push({ name: 'Rent' , value: Rent_defaulter.length });
-  		home_own0.push({ name: 'Rent' , value: Rent_defaulter.length });
-  		$("#Rent_defaulter")[0].innerHTML =Rent_defaulter.length ;
+		home_owndership = d3.nest()	
+  			.key(function(d) { return d.loan_status; })
+  			.key(function(d) { return homeownsershiparray[d.home_ownership]; })
+  			.rollup(function(v) { return v.length; })
+  			.entries(data);
+  		console.log( home_owndership );
 
-  		var Rent_nondefaulter = data.filter(function(d) { return d.home_ownership == 2 && d.loan_status == 0 ; });
-  		console.log(JSON.stringify(Rent_nondefaulter.length));
-  		home_own.push({ name: 'Rent' , value: Rent_nondefaulter.length });
-  		home_own1.push({ name: 'Rent' , value: Rent_nondefaulter.length });
-		$("#Rent_nondefaulter")[0].innerHTML = Rent_nondefaulter.length;  		
+  		home_owndership.forEach(function(currentValue, index, arr){
+  			console.log( currentValue );
+  			var loan_status_hold = loan_status[currentValue.key];
+  			currentValue.values.forEach( function(curval , i ,a){
+  				console.log( curval );
+  				$('#'+curval.key+'_'+loan_status_hold)[0].innerHTML = curval.value;
+  			});
+  		})
 
-  		var Morgage_defaulter = data.filter(function(d) { return d.home_ownership == 3 && d.loan_status == 1 ; });
-  		console.log(JSON.stringify(Morgage_defaulter.length));
-  		home_own.push({ name: 'Morgage' , value: Morgage_defaulter.length });
-  		home_own0.push({ name: 'Morgage' , value: Morgage_defaulter.length });
-		$("#Morgage_defaulter")[0].innerHTML = Morgage_defaulter.length;
-
-  		var Morgage_nondefaulter = data.filter(function(d) { return d.home_ownership == 3 && d.loan_status == 0 ; });
-  		console.log(JSON.stringify(Morgage_nondefaulter.length));
-  		home_own.push({ name: 'Morgage' , value: Morgage_nondefaulter.length });
-  		home_own1.push({ name: 'Morgage' , value: Morgage_nondefaulter.length });
-		$("#Morgage_nondefaulter")[0].innerHTML = Morgage_nondefaulter.length ;
-
-
-		x.domain(home_own.map(function(d) { return d.name; }));
-  		y.domain([0, d3.max(home_own, function(d) { return d.value; })]);
+		x.domain(["Own","Rent","Morgage"]);
+  		y.domain([0, 500]);
 
   		g.append("g")
   		      .attr("class", "axis axis--x")
@@ -146,19 +130,19 @@ Morgage
 		      .text("Frequency");
 
 		  g.selectAll(".bar")
-		    .data(home_own0)
+		    .data(home_owndership[0].values)
 		    .enter().append("rect")
 		      .attr("class", "bar")
-		      .attr("x", function(d) { return x(d.name)+20; })
+		      .attr("x", function(d) { return x(d.key)+20; })
 		      .attr("y", function(d) { return y(d.value); })
 		      .attr("width", "25px" )
 		      .attr("height", function(d) { return height - y(d.value); });
 
 		  g.selectAll(".bar1")
-		    .data(home_own1)
+		    .data(home_owndership[1].values)
 		    .enter().append("rect")
 		      .attr("class", "bar1")
-		      .attr("x", function(d) { return x(d.name) + 50; })
+		      .attr("x", function(d) { return x(d.key) + 50; })
 		      .attr("y", function(d) { return y(d.value); })
 		      .attr("width", "25px" )
 		      .attr("height", function(d) { return height - y(d.value); });
