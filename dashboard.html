@@ -168,7 +168,7 @@ Mortgage
 
 		var XSS = d3.scaleOrdinal()
 		    .domain(ff)
-		    .range(ddd);
+		    .range([0,340]);
 			
 		var brush = d3.brushX()
 	    .extent([[0, 0], [width, height]])
@@ -206,7 +206,7 @@ Mortgage
       .call(brush)
 
 
-      function brushed() {  var s = d3.event.selection || x2.range(); console.log( s , d3.event ); }
+      function brushed() {  var s = d3.event.selection || x2.range(); console.log( s ); }
 
 				 
 	});
