@@ -83,10 +83,14 @@ Mortgage
 
 	var margin = {top: 20, right: 20, bottom: 30, left: 40},
 	    width = +owner_graph.attr("width") - margin.left - margin.right,
-	    height = +owner_graph.attr("height") - margin.top - margin.bottom;   //set first graph margins
+	    height = +owner_graph.attr("height") - margin.top - margin.bottom,   //set first graph margins
+	    width2 = +grade_graph.attr("width") - margin.left - margin.right,
+	    height2 = +grade_graph.attr("height") - margin.top - margin.bottom; 
 
 	var x = d3.scaleBand().rangeRound([0, width]).padding(0.1),
-	    y = d3.scaleLinear().rangeRound([height, 0]);                //x,y scales
+	    y = d3.scaleLinear().rangeRound([height, 0]),                //x,y scales, 1st graph
+	    x2 = d3.scaleBand().rangeRound([0, width2]).padding(0.1),
+	    y2 = d3.scaleLinear().rangeRound([height2, 0]);              //x,y scales, 2nd graph
 
 	var g_own = owner_graph.append("g")
 	    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
@@ -95,10 +99,11 @@ Mortgage
 
 
 	function brushed() {  var s = d3.event.selection || x2.range(); console.log(s) ; }
-
-	var brush = d3.brushX()
-	    .extent([[0, 0], [width, height]])
-	    .on("brush end", brushed);
+	var brush = d3.brush()
+	    .extent([[0, 0], [width2, height2]])
+	    .on('brush end', brushed)
+	brush(g_grade)                              // attach the brush to the graph
+	
 	
 
 	d3.csv("dashboard_banking_dataset.csv", function(data) {
@@ -198,7 +203,7 @@ Mortgage
 				 g_grade.append("g")
       .attr("class", "brush")
       .call(brush)
-      .call(brush.move, x.range());
+      .call(brush.move, x2.range());
 
 
 				 
