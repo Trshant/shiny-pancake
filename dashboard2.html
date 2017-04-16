@@ -83,28 +83,17 @@ Mortgage
 
 	var margin = {top: 20, right: 20, bottom: 30, left: 40},
 	    width = +owner_graph.attr("width") - margin.left - margin.right,
-	    height = +owner_graph.attr("height") - margin.top - margin.bottom,   //set first graph margins
-	    width2 = +grade_graph.attr("width") - margin.left - margin.right,
-	    height2 = +grade_graph.attr("height") - margin.top - margin.bottom; 
+	    height = +owner_graph.attr("height") - margin.top - margin.bottom;   //set first graph margins
 
 	var x = d3.scaleBand().rangeRound([0, width]).padding(0.1),
-	    y = d3.scaleLinear().rangeRound([height, 0]),                //x,y scales, 1st graph
-	    x2 = d3.scaleBand().rangeRound([0, width2]).padding(0.1),
-	    y2 = d3.scaleLinear().rangeRound([height2, 0]);              //x,y scales, 2nd graph
+	    y = d3.scaleLinear().rangeRound([height, 0]),                //x,y scales
+	    x2=d3.scaleBand().rangeRound([0, width]).padding(0.1);
 
 	var g_own = owner_graph.append("g")
 	    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 	var g_grade = grade_graph.append("g")
 	    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-
-	function brushed() {  var s = d3.event.selection || x2.range(); console.log(s) ; }
-	var brush = d3.brush()
-	    .extent([[0, 0], [width2, height2]])
-	    .on('brush end', brushed)
-	brush(g_grade)                              // attach the brush to the graph
-	
-	
 
 	d3.csv("dashboard_banking_dataset.csv", function(data) {
   		console.log(data.length);
@@ -120,13 +109,13 @@ Mortgage
   			.key(function(d) { return homeownsershiparray[d.home_ownership]; })
   			.rollup(function(v) { return v.length; })
   			.entries(data);
-  		console.log( home_owndership );
+  		console.log(home_owndership );
 
   		home_owndership.forEach(function(currentValue, index, arr){
   			console.log( currentValue );
   			var loan_status_hold = loan_status[currentValue.key];
   			currentValue.values.forEach( function(curval , i ,a){
-  				console.log( curval );
+  				console.log( "cur "+curval );
   				$('#'+curval.key+'_'+loan_status_hold)[0].innerHTML = curval.value;
   			});
   		})
@@ -170,41 +159,62 @@ Mortgage
 		var ambade = d3.nest().key(function(d) { return d.sub_grade; }).rollup(function(v) { return v.length; }).entries(data);
 
 		sortedambade = ambade.sort( function(x,y){ x = parseInt(x.key);y = parseInt(y.key);if( x<y ){return -1}else if(x==y){return 0;}else{ return 1 } } ) ;
-		var ff = ambade.map(function(a) {return a.key;});
-		var ff2 = ambade.map(function(a) {return a.value;});
+		
+		var list_of_grades = ambade.map(function(a) {return a.key;});  //grades
+		
+		var list_of_grade_counts = ambade.map(function(a) {return a.value;});  //cnt per grade
 
-				x.domain(ff);
-		  		y.domain([0,200]);
+		var ddd = [];
+		list_of_grades.forEach(function(e,i){ ddd.push( (16*i)+18 ) });
 
-		  		g_grade.append("g")
-		  		      .attr("class", "axis axis--x")
-		  		      .attr("transform", "translate(0," + height + ")")
-		  		      .call(d3.axisBottom(x));
 
-				  g_grade.append("g")
-				      .attr("class", "axis axis--y")
-				      .call(d3.axisLeft(y).ticks())
-				    .append("text")
-				      .attr("transform", "rotate(-90)")
-				      .attr("y", 6)
-				      .attr("dy", "0.71em")
-				      .attr("text-anchor", "end")
-				      .text("Frequency");
+		//Scale Quantize :: continuous domain to discrete range
+		
+		var px_to_grade = d3.scaleQuantize()   //conversion from pixel values to grades for selection
+		    .domain([0,340])             //values on screen
+		    .range(list_of_grades);      //grade numbers
+			
+		var brush = d3.brushX()
+	    .extent([[0, 0], [width, height]])     //limit of brushing
+	    .on("end", brushed);                   //event of brush ended
 
-				  g_grade.selectAll(".bar")
-				    .data(sortedambade)
-				    .enter().append("rect")
-				      .attr("class", "bar")
-				      .attr("x", function(d) { return x(d.key)+20; })
-				      .attr("y", function(d) { return y(d.value); })
-				      .attr("width", "5px" )
-				      .attr("height", function(d) { return height - y(d.value); });
+		x2.domain(list_of_grades);
+		y.domain([d3.max([0,d3.min(list_of_grade_counts)-10]),d3.max(list_of_grade_counts)+10]);  //set y for second graph
+		
+		g_grade.append("g")
+		      .attr("class", "axis axis--x")
+		      .attr("transform", "translate(0," + height + ")")
+		      .call(d3.axisBottom(x2));
 
-				 g_grade.append("g")
-      .attr("class", "brush")
+	  g_grade.append("g")
+	      .attr("class", "axis axis--y")
+	      .call(d3.axisLeft(y).ticks())
+	    .append("text")
+	      .attr("transform", "rotate(-90)")
+	      .attr("y", 6)
+	      .attr("dy", "0.71em")
+	      .attr("text-anchor", "end")
+	      .text("Frequency");
+
+	  g_grade.selectAll(".bar")
+	    .data(sortedambade)
+	    .enter().append("rect")
+	      .attr("class", "bar")
+	      .attr("x", function(d) { return x2(d.key)+20; })
+	      .attr("y", function(d) { return y(d.value); })
+	      .attr("width", "5px" )
+	      .attr("height", function(d) { return height - y(d.value); });
+
+	 g_grade.append("g")
+      .attr("class", "brush")       //add the brush
       .call(brush)
-      .call(brush.move, x2.range());
 
+
+      function brushed() {  var s = d3.event.selection || x2.range(); 	//selected or range
+		 console.log( s );          							//selection
+		 var sel_grades=[px_to_grade(s[0]),px_to_grade(s[1])];
+		 console.log(sel_grades[0]+" "+sel_grades[1]);  //converted to grade numbers
+	}
 
 				 
 	});
